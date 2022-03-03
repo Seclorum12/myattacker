@@ -1,6 +1,8 @@
 # modified fetch function with semaphore
 import random
 import asyncio
+from abc import ABC, abstractmethod
+
 from aiohttp import ClientSession
 from datetime import datetime
 
@@ -8,6 +10,12 @@ requests = 0
 clients_num = 100
 url = ''
 start_time = datetime.now()
+
+
+class Attacker(ABC):
+    @abstractmethod
+    def run(self):
+        ...
 
 
 async def make_request():
