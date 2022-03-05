@@ -17,7 +17,6 @@ class TcpServer:
         soc.listen(5)
         while True:
             conn, addr = soc.accept()
-            from_client = []
             while True:
                 try:
                     data = conn.recv(4096)
@@ -25,9 +24,11 @@ class TcpServer:
                     break
                 if not data:
                     break
-                from_client.append(data)
-                print(f'Data received: {from_client}')
-                conn.send(f'Received data {from_client}'.encode('UTF-8'))
+                try:
+                    print(data.decode('UTF-8'))
+                except UnicodeDecodeError:
+                    print('Received data can not me decoded')
+                conn.send(f'Received data {data}'.encode('UTF-8'))
             conn.close()
 
 
