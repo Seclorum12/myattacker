@@ -1,3 +1,4 @@
+import socket
 from abc import ABC, abstractmethod
 from .utils import Address
 
@@ -27,5 +28,5 @@ class Attacker(ABC):
 
 class SocketAttacker(Attacker, ABC):
     @abstractmethod
-    def get_socket(self):
+    def get_socket(self) -> socket.socket:
         ...
