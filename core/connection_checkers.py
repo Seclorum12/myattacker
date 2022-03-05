@@ -34,17 +34,26 @@ class SocketChecker(ConncetionChecker, ABC):
         s = self.get_socket()
         try:
             s.connect((self._address, int(self._port)))
+            s.sendall(self.msg)
+            data = s.recv(1024)
             s.shutdown(socket.SHUT_RDWR)
+            print(f'Received resonce: {data.decode()}')
         except TimeoutError:
             raise AddressNotAvailable(f'Timeout {self._timeout} seconds')
+        except ConnectionRefusedError:
+            raise AddressNotAvailable(f'Connection refused')
         except socket.gaierror as err:
             raise AddressNotAvailable(str(err))
         finally:
             s.close()
 
+    @property
+    def msg(self):
+        return b'putin Huilo'
+
 
 class UDPChecker(SocketChecker):
-    def get_socket(self):
+    def get_socket(self) -> socket.socket:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.settimeout(self.timeout)
         return s

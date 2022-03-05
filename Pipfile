@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 aiohttp = "*"
 invoke = "*"
+scapy = "*"
 
 [dev-packages]
 black = "*"
