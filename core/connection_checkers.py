@@ -38,11 +38,9 @@ class SocketChecker(ConncetionChecker, ABC):
             data = s.recv(1024)
             s.shutdown(socket.SHUT_RDWR)
             print(f'Received resonce: {data.decode()}')
-        except TimeoutError:
-            raise AddressNotAvailable(f'Timeout {self._timeout} seconds')
         except ConnectionRefusedError:
             raise AddressNotAvailable(f'Connection refused')
-        except socket.gaierror as err:
+        except (socket.gaierror, socket.timeout) as err:
             raise AddressNotAvailable(str(err))
         finally:
             s.close()
