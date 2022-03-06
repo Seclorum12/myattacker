@@ -9,7 +9,7 @@ REGULAR_HEADERS = ["User-agent: Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/2010
 
 
 class SlowLoris(SocketAttacker):
-    def __init__(self, address, sockets_to_keep=1000, keep_connection_timeout=5):
+    def __init__(self, address, sockets_to_keep=10000, keep_connection_timeout=5):
         super().__init__(address)
         self._sockets_to_keep = sockets_to_keep
         self._sockets_list = []
